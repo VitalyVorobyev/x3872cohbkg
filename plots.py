@@ -40,8 +40,6 @@ def show_model(pdict=params()):
     x = np.linspace(3.84, 3.91, N)
     s, b, total = model(x, **pdict)
     
-    # lo, hi = int(0.08*N), int(0.92*N)
-    # x, s, b, total = [a[lo:hi] for a in [x, s, b, total]]
     plt.figure(figsize=(8,6))
     plt.plot(x, total)
     plt.plot(x, s)
@@ -66,7 +64,6 @@ def show_fit(data, pars):
     pdf, _ = make_pdf(lo, hi, pars)
     x = np.linspace(lo, hi, dots)
     y = pdf(x)
-    # y /= np.sum(y) * (x[1] - x[0]) * bins / dots / 10
     y /= np.sum(y) * (x[1] - x[0]) * (x[-1] - x[0])
 
     plt.figure(figsize=(8,6))

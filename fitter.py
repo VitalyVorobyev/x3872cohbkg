@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
+import sys
 import numpy as np
 import scipy.integrate as integrate
+import matplotlib.pyplot as plt
 from iminuit import Minuit
 
 from lineshapes import *
@@ -84,18 +86,53 @@ def init_noncoh_fit(pars=params()):
            'b1': pars['b'][2],       'error_b1': 0.1,      'limit_b1': (-1., 3.),          'fix_b1': False
     }
 
-def main():
+def noncoh_phase_scan():
     """ """
     f = Fitter()
-    # data = np.load('events.npy')
+    pars = params()
+    true_mass, true_width = [pars[key] for key in ['mass', 'width']]
+    phi, fit_mass, fit_width, valid_fit = [], [], [], []
+    with open('log1.txt', 'w') as file:
+        file.write('Noncoherent fit with phase scan')
+        for key, val in pars.items():
+            file.write(f'{key}: {val}')
+        for ph in np.linspace(-np.pi, np.pi, 20):
+            file.write(f'phase {ph}')
+            pars['phase'] = ph
+            data = np.array(generate(10**5, pars))
+            fmin, par, corrmtx = f.fitTo(data, init_noncoh_fit())
+            phi.append(ph)
+            fit_mass.append( [par[0]['value'], par[0]['error']])
+            fit_width.append([par[1]['value'], par[1]['error']])
+            valid_fit.append(fmin.is_valid)
+            # show_fit(data, f.pars)
+    fit_mass, fit_width = [np.array(x) for x in [fit_mass, fit_width]]
+    print(valid_fit)
+    print(fit_mass)
+    print(fit_width)
+    plt.figure()
+    plt.errorbar(phi, fit_mass[:,0] - true_mass, yerr=fit_mass[:,1], marker='.', linestyle='none')
+    plt.grid()
+    plt.tight_layout()
+    
+    plt.figure()
+    plt.errorbar(phi, fit_width[:,0] - true_width, yerr=fit_mass[:,1], marker='.', linestyle='none')
+    plt.grid()
+    plt.tight_layout()
+    plt.show()
+
+def main():
+    """ """
+    # noncoh_phase_scan()
+    f = Fitter()
     data = np.array(generate(10**5))
-    # fmin, _, corrmtx = f.fitTo(data, init_fixed_bck_fit())
+    # fmin, par, corrmtx = f.fitTo(data, init_noncoh_fit())
     fmin, _, corrmtx = f.fitTo(data, init_full_fit())
+    # fmin, _, corrmtx = f.fitTo(data, init_fixed_bck_fit())
+
     print(fmin)
-    show_fit(data, f.pars)
-    fmin, _, corrmtx = f.fitTo(data, init_noncoh_fit())
-    # print(corrmtx)
-    print(fmin)
+    # print(fmin.is_valid)
+    # print(par[0]['error'])
     show_fit(data, f.pars)
 
 if __name__ == '__main__':
