@@ -37,53 +37,42 @@ class Fitter(object):
         self.data = data
         self.lo, self.hi = min(data), max(data)
         
-        minimizer = Minuit(self.fcn, errordef=0.5, **init)
+        minimizer = Minuit(self.fcn, errordef=0.5, **init) 
 
         fmin, param = minimizer.migrad()
         minimizer.print_param()
         corrmtx = minimizer.matrix(correlation=True)
         return (fmin, param, corrmtx)
 
+def rndm_angle():
+    return -np.pi + 2.*np.pi*np.random.random()
+
 def init_full_fit(pars=params()):
     """ """
     return {
-         'mass': pars['mass'],     'error_mass': 0.01,   'limit_mass': (3.86, 3.89),     'fix_mass': False,
-        'width': pars['width'],   'error_width': 0.001, 'limit_width': (0., 0.002),     'fix_width': False,
-         'fcoh': pars['fcoh'],     'error_fcoh': 0.1,    'limit_fcoh': (0., 1.),         'fix_fcoh': False,
-         'fbkg': pars['fbkg'],     'error_fbkg': 0.1,    'limit_fbkg': (0., 1.),         'fix_fbkg': False,
-        'phase': pars['phase'],   'error_phase': 0.1,   'limit_phase': (-np.pi, np.pi), 'fix_phase': False,
-        'sigma': pars['sigma'],   'error_sigma': 0.1,   'limit_sigma': (0.0001, 0.005), 'fix_sigma': True,
-         'bcoh': pars['bcoh'][1],  'error_bcoh': 0.1,    'limit_bcoh': (0.5, 1.5),       'fix_bcoh': False,
-           'b0': pars['b'][1],       'error_b0': 0.1,      'limit_b0': (-1., 1.),          'fix_b0': True,
-           'b1': pars['b'][2],       'error_b1': 0.1,      'limit_b1': (-1., 3.),          'fix_b1': True
-    }
-
-def init_fixed_bck_fit(pars=params()):
-    """ """
-    return {
-         'mass': pars['mass'],     'error_mass': 0.01,   'limit_mass': (3.86, 3.89),     'fix_mass': False,
-        'width': pars['width'],   'error_width': 0.001, 'limit_width': (0., 0.002),     'fix_width': True,
-         'fcoh': pars['fcoh'],     'error_fcoh': 0.1,    'limit_fcoh': (0., 1.),         'fix_fcoh': True,
-         'fbkg': pars['fbkg'],     'error_fbkg': 0.1,    'limit_fbkg': (0., 1.),         'fix_fbkg': True,
-        'phase': pars['phase'],   'error_phase': 0.1,   'limit_phase': (-np.pi, np.pi), 'fix_phase': True,
-        'sigma': pars['sigma'],   'error_sigma': 0.1,   'limit_sigma': (0.0001, 0.005), 'fix_sigma': True,
-         'bcoh': pars['bcoh'][1],  'error_bcoh': 0.1,    'limit_bcoh': (0.5, 1.5),       'fix_bcoh': True,
-           'b0': pars['b'][1],       'error_b0': 0.1,      'limit_b0': (-1., 1.),          'fix_b0': True,
-           'b1': pars['b'][2],       'error_b1': 0.1,      'limit_b1': (-1., 3.),          'fix_b1': True
+         'mass': pars['mass'],       'error_mass': 0.01,   'limit_mass': (3.86, 3.89),     'fix_mass': False,
+        'width': pars['width'],     'error_width': 0.001, 'limit_width': (0., 0.002),     'fix_width': False,
+         'fcoh': np.random.random(), 'error_fcoh': 0.1,    'limit_fcoh': (0., 1.),         'fix_fcoh': False,
+         'fbkg': np.random.random(), 'error_fbkg': 0.1,    'limit_fbkg': (0., 1.),         'fix_fbkg': False,
+        'phase': rndm_angle(),      'error_phase': 0.1,   'limit_phase': (-np.pi, np.pi), 'fix_phase': False,
+        'sigma': pars['sigma'],     'error_sigma': 0.1,   'limit_sigma': (0.0001, 0.005), 'fix_sigma': True,
+         'bcoh': pars['bcoh'][1],    'error_bcoh': 0.1,    'limit_bcoh': (0.5, 1.5),       'fix_bcoh': False,
+           'b0': pars['b'][1],         'error_b0': 0.1,      'limit_b0': (-1., 1.),          'fix_b0': True,
+           'b1': pars['b'][2],         'error_b1': 0.1,      'limit_b1': (-1., 3.),          'fix_b1': True
     }
 
 def init_noncoh_fit(pars=params()):
     """ """
     return {
-         'mass': pars['mass'],     'error_mass': 0.01,   'limit_mass': (3.86, 3.89),     'fix_mass': False,
-        'width': pars['width'],   'error_width': 0.001, 'limit_width': (0., 0.002),     'fix_width': False,
-         'fcoh': 0,                'error_fcoh': 0.1,    'limit_fcoh': (0., 1.),         'fix_fcoh': True,
-         'fbkg': pars['fbkg'],     'error_fbkg': 0.1,    'limit_fbkg': (0., 1.),         'fix_fbkg': False,
-        'phase': pars['phase'],   'error_phase': 0.1,   'limit_phase': (-np.pi, np.pi), 'fix_phase': True,
-        'sigma': pars['sigma'],   'error_sigma': 0.1,   'limit_sigma': (0.0001, 0.005), 'fix_sigma': True,
-         'bcoh': pars['bcoh'][1],  'error_bcoh': 0.1,    'limit_bcoh': (0.5, 1.5),       'fix_bcoh': True,
-           'b0': pars['b'][1],       'error_b0': 0.1,      'limit_b0': (-1., 1.),          'fix_b0': False,
-           'b1': pars['b'][2],       'error_b1': 0.1,      'limit_b1': (-1., 3.),          'fix_b1': False
+         'mass': pars['mass'],       'error_mass': 0.01,   'limit_mass': (3.86, 3.89),     'fix_mass': False,
+        'width': pars['width'],     'error_width': 0.001, 'limit_width': (0., 0.002),     'fix_width': False,
+         'fcoh': 0,                  'error_fcoh': 0.1,    'limit_fcoh': (0., 1.),         'fix_fcoh': True,
+         'fbkg': np.random.random(), 'error_fbkg': 0.1,    'limit_fbkg': (0., 1.),         'fix_fbkg': False,
+        'phase': pars['phase'],     'error_phase': 0.1,   'limit_phase': (-np.pi, np.pi), 'fix_phase': True,
+        'sigma': pars['sigma'],     'error_sigma': 0.1,   'limit_sigma': (0.0001, 0.005), 'fix_sigma': True,
+         'bcoh': pars['bcoh'][1],    'error_bcoh': 0.1,    'limit_bcoh': (0.5, 1.5),       'fix_bcoh': True,
+           'b0': pars['b'][1],         'error_b0': 0.1,      'limit_b0': (-1., 1.),          'fix_b0': False,
+           'b1': pars['b'][2],         'error_b1': 0.1,      'limit_b1': (-1., 3.),          'fix_b1': False
     }
 
 def noncoh_phase_scan():
@@ -121,19 +110,54 @@ def noncoh_phase_scan():
     plt.tight_layout()
     plt.show()
 
-def main():
-    """ """
-    # noncoh_phase_scan()
+def uncoh_fit():
     f = Fitter()
     data = np.array(generate(10**5))
-    # fmin, par, corrmtx = f.fitTo(data, init_noncoh_fit())
-    fmin, _, corrmtx = f.fitTo(data, init_full_fit())
-    # fmin, _, corrmtx = f.fitTo(data, init_fixed_bck_fit())
-
+    fmin, par, corrmtx = f.fitTo(data, init_noncoh_fit())
     print(fmin)
+    print(corrmtx)
+    print(' mass: {:>7.2f} +- {:>4.2f} MeV'.format(par[0]['value']*10**3, par[0]['error']*10**3))
+    print('width: {:>7.2f} +- {:>4.2f} MeV'.format(par[1]['value']*10**3, par[1]['error']*10**3))
+
+    show_fit(data, f.pars)
+
+def full_fit():
+    f = Fitter()
+    data = np.array(generate(10**5))
+    fmin, par, corrmtx = f.fitTo(data, init_full_fit())
+    print(fmin)
+    print(corrmtx)
+    print(' mass:  {:>7.2f} +- {:>4.2f} MeV'.format(par[0]['value']*10**3, par[0]['error']*10**3))
+    print('width:  {:>7.2f} +- {:>4.2f} MeV'.format(par[1]['value']*10**3, par[1]['error']*10**3))
+    print(' fcoh: ({:>7.2f} +- {:>4.2f}) / 100'.format(par[2]['value']*10**2, par[2]['error']*10**2))
+    print(' fbkg: ({:>7.2f} +- {:>4.2f}) / 100'.format(par[3]['value']*10**2, par[3]['error']*10**2))
+    print('phase:  {:>7.2f} +- {:>4.2f}'.format(par[4]['value'], par[4]['error']))
+
+    show_fit(data, f.pars)
+
+def main():
+    """ """
+    if len(sys.argv) == 2:
+        if sys.argv[1] == 'full':
+            full_fit()
+        elif sys.argv[1] == 'ucoh':
+            uncoh_fit()
+        elif sys.argv[1] == 'scan':
+            noncoh_phase_scan()
+        else:
+            print('Wrong command')
+            return
+    else:
+        uncoh_fit()
+    
+    # 
+    # 
+    # fmin, _, corrmtx = f.fitTo(data, init_full_fit())
+
+    # print(fmin)
     # print(fmin.is_valid)
     # print(par[0]['error'])
-    show_fit(data, f.pars)
+    # show_fit(data, f.pars)
 
 if __name__ == '__main__':
     main()

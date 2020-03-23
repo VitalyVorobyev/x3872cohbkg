@@ -52,7 +52,7 @@ def model(x, mass, width, fcoh, fbkg, phase, sigma, b, bcoh):
 def make_pdf(lo, hi, params):
     """ """
     grid = 500
-    x = np.linspace(lo, hi, grid)
+    x = np.linspace(0.9*lo, 1.1*hi, grid)
     _, _, total = model(x, **params)
     return (interpolate.CubicSpline(x, total), 1.01 * max(total))
 
@@ -61,9 +61,9 @@ def params():
     return {
          'mass': 3.872,
         'width': 0.001,
-         'fcoh': 1,
-         'fbkg': 0.130,
-        'phase': 0.5*np.pi,
+         'fcoh': 0.008,
+         'fbkg': 0.000,
+        'phase': 1.57,
         'sigma': 0.00243,
          'bcoh': [1, 1],
             'b': [1, 1, 0]

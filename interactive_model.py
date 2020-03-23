@@ -27,9 +27,9 @@ def show_model(pdict=params()):
     axfcoh = plt.axes([0.15, 0.10, 0.65, 0.03], facecolor=axcolor)
     axfbkg = plt.axes([0.15, 0.05, 0.65, 0.03], facecolor=axcolor)
 
-    sphi  = Slider( axphi,  'phi', -np.pi, np.pi, valinit=pdict['phase'])
-    sfcoh = Slider(axfcoh, 'fcoh',     0.,  0.05, valinit=pdict['fcoh'], valfmt='%1.3f')
-    sfbkg = Slider(axfbkg, 'fbkg',     0.,  1.00, valinit=pdict['fbkg'], valfmt='%1.3f')
+    sphi  = Slider( axphi,  'phi', -np.pi, np.pi, valinit=pdict['phase'], valfmt='%1.3f')
+    sfcoh = Slider(axfcoh, 'fcoh',     0.,  0.05, valinit=pdict['fcoh'],  valfmt='%1.3f')
+    sfbkg = Slider(axfbkg, 'fbkg',     0.,  1.00, valinit=pdict['fbkg'],  valfmt='%1.3f')
 
     def update(val):
         pdict.update({
