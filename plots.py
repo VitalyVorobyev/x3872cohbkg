@@ -65,9 +65,14 @@ def show_fit(data, pars):
     x = np.linspace(lo, hi, dots)
     y = pdf(x)
     y /= np.sum(y) * (x[1] - x[0]) * (x[-1] - x[0])
+    binsize = (hi - lo) / bins * 10**3
 
+    plt.rc('xtick', labelsize=12)
+    plt.rc('ytick', labelsize=12)
     plt.figure(figsize=(8,6))
     plt.hist(data, bins=bins)
+    plt.ylabel('events / {:.2f} MeV'.format(binsize), fontsize=16)
+    plt.xlabel(r'$m(J/\psi\pi^+\pi^-)$, GeV'.format(binsize), fontsize=16)
     plt.plot(x, y)
     plt.grid()
     plt.tight_layout()
