@@ -57,20 +57,47 @@ def show_data(fname):
     plt.grid()
     plt.tight_layout()
 
-def show_fit(data, pars):
+def show_fit(data, pars, weight=None):
     """ """
     dots, bins, N = 500, 250, data.shape[0]
+    if weight is None:
+        weight = np.ones(data.shape)
     lo, hi = min(data), max(data)
     pdf, _ = make_pdf(lo, hi, pars)
     x = np.linspace(lo, hi, dots)
     y = pdf(x)
-    y /= np.sum(y) * (x[1] - x[0]) * (x[-1] - x[0])
+    integral_pdf = np.sum(y) / dots
+    integral_hist = np.sum(weight) / bins
+    y /= integral_pdf / integral_hist
     binsize = (hi - lo) / bins * 10**3
 
     plt.rc('xtick', labelsize=12)
     plt.rc('ytick', labelsize=12)
     plt.figure(figsize=(8,6))
-    plt.hist(data, bins=bins)
+    plt.hist(data, bins=bins, weights=weight)
+    plt.ylabel('events / {:.2f} MeV'.format(binsize), fontsize=16)
+    plt.xlabel(r'$m(J/\psi\pi^+\pi^-)$, GeV'.format(binsize), fontsize=16)
+    plt.plot(x, y)
+    plt.grid()
+    plt.tight_layout()
+    plt.show()
+
+def show_hist_fit(bins, hdata, herrs, pars):
+    """ """
+    lo, hi = bins[0], bins[-1]
+    dots, nbins, N = 500, hdata.shape[0], np.sum(hdata)
+    pdf, _ = make_pdf(lo, hi, pars)
+    x = np.linspace(lo, hi, dots)
+    y = pdf(x)
+    integral_pdf = np.sum(y) / dots
+    integral_hist = N / nbins
+    y /= integral_pdf / integral_hist
+    binsize = (hi - lo) / nbins * 10**3
+
+    plt.rc('xtick', labelsize=12)
+    plt.rc('ytick', labelsize=12)
+    plt.figure(figsize=(8,6))
+    plt.errorbar(bins, hdata, yerr=herrs, linestyle='none', marker='.', markersize=2)
     plt.ylabel('events / {:.2f} MeV'.format(binsize), fontsize=16)
     plt.xlabel(r'$m(J/\psi\pi^+\pi^-)$, GeV'.format(binsize), fontsize=16)
     plt.plot(x, y)

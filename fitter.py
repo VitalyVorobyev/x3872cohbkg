@@ -26,8 +26,8 @@ class Fitter(object):
         self.norm, _ = integrate.quad(self.pdf, self.lo, self.hi)
 
         loglh = self.loglh()
-        print('loglh: {:.2f}, m {:.3f}, w {:.3f}, fcoh {:.3f}, fbck {:.3f}, phi {:.3f}, norm {:.3f}'.format(
-            loglh, mass*10**3, width*10**3, fcoh, fbkg, phase, self.norm))
+        # print('loglh: {:.2f}, m {:.3f}, w {:.3f}, fcoh {:.3f}, fbck {:.3f}, phi {:.3f}, norm {:.3f}'.format(
+            # loglh, mass*10**3, width*10**3, fcoh, fbkg, phase, self.norm))
         return loglh
     
     def loglh(self):
@@ -37,11 +37,11 @@ class Fitter(object):
         self.data = data
         self.lo, self.hi = min(data), max(data)
         
-        minimizer = Minuit(self.fcn, errordef=0.5, **init) 
+        self.minimizer = Minuit(self.fcn, errordef=0.5, **init) 
 
-        fmin, param = minimizer.migrad()
-        minimizer.print_param()
-        corrmtx = minimizer.matrix(correlation=True)
+        fmin, param = self.minimizer.migrad()
+        self.minimizer.print_param()
+        corrmtx = self.minimizer.matrix(correlation=True)
         return (fmin, param, corrmtx)
 
 def rndm_angle():
@@ -134,6 +134,21 @@ def full_fit():
     print('phase:  {:>7.2f} +- {:>4.2f}'.format(par[4]['value'], par[4]['error']))
 
     show_fit(data, f.pars)
+
+    bins, value, mres = f.minimizer.mnprofile('fbkg', bins=30, bound=2, subtract_min=False)
+    print(bins)
+    print(value)
+    print(mres)
+
+    scans1 = f.minimizer.mncontour('fcoh', 'fbkg', numpoints=20, sigma=1)
+    print(scans1)
+    for x,y, in scans1:
+        print('  {:.3f}, {:.3f}'.format(x*100, y*100))
+
+    x = [a[0] for a in scans1]
+    y = [a[0] for a in scans1]
+    plt.plot(x, y)
+    plt.show()
 
 def main():
     """ """
