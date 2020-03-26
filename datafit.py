@@ -107,44 +107,59 @@ class FitterBinned(object):
 def rndm_angle():
     return -np.pi + 2.*np.pi*np.random.random()
 
+def mnpardict(name, val, err, range, fixed):
+    return {name: val, f'error_{name}': err, f'limit_{name}': range, f'fix_{name}': fixed}
+
 def init_full_fit(pars=params()):
     """ """
-    return {
-         'mass': pars['mass'],       'error_mass': 0.01,   'limit_mass': (3.86, 3.89),     'fix_mass': False,
-        'width': pars['width'],     'error_width': 0.0005,'limit_width': (0., 0.0025),    'fix_width': False,
-         'fcoh': np.random.random(), 'error_fcoh': 0.1,    'limit_fcoh': (0., 1.),         'fix_fcoh': False,
-         'fbkg': np.random.random(), 'error_fbkg': 0.1,    'limit_fbkg': (0., 1.),         'fix_fbkg': False,
-        'phase': rndm_angle(),      'error_phase': 0.1,   'limit_phase': (-np.pi, np.pi), 'fix_phase': False,
-        'sigma': pars['sigma'],     'error_sigma': 0.1,   'limit_sigma': (0.0001, 0.005), 'fix_sigma': True,
-           'b0': 10**3,                'error_b0': 10,       'limit_b0': (-100., 10**4.),    'fix_b0': False,
-           'b1': 0,                    'error_b1': 10,       'limit_b1': (-100., 100.),      'fix_b1': True
-    }
+    dicts = [
+        mnpardict( 'mass', pars['mass'],       0.01,   (3.86, 3.89),    False),
+        mnpardict('width', pars['width'],      0.0005, (0., 0.0025),    False),
+        mnpardict( 'fcoh', np.random.random(), 0.1,    (0., 1.),        False),
+        mnpardict( 'fbkg', np.random.random(), 0.1,    (0., 1.),        False),
+        mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), False),
+        mnpardict('sigma', pars['sigma'],      0.1,    (0.0001, 0.005), True),
+        mnpardict(   'b0', 10**3,              10,     (-100., 10**4.), False),
+        mnpardict(   'b1', 0,                  10,     (-100., 100.),   False),
+    ]
+    res = {}
+    for d in dicts:
+        res.update(d)
+    return res
 
 def init_noncoh_fit(pars=params()):
     """ """
-    return {
-         'mass': pars['mass'],       'error_mass': 0.01,   'limit_mass': (3.86, 3.89),     'fix_mass': False,
-        'width': pars['width'],     'error_width': 0.001, 'limit_width': (0., 0.0025),    'fix_width': False,
-         'fcoh': 0,                  'error_fcoh': 0.1,    'limit_fcoh': (0., 1.),         'fix_fcoh': True,
-         'fbkg': np.random.random(), 'error_fbkg': 0.1,    'limit_fbkg': (0., 1.),         'fix_fbkg': False,
-        'phase': pars['phase'],     'error_phase': 0.1,   'limit_phase': (-np.pi, np.pi), 'fix_phase': True,
-        'sigma': pars['sigma'],     'error_sigma': 0.1,   'limit_sigma': (0.0001, 0.005), 'fix_sigma': True,
-           'b0': pars['b'][1],         'error_b0': 0.1,      'limit_b0': (-100., 100.),      'fix_b0': False,
-           'b1': pars['b'][2],         'error_b1': 0.1,      'limit_b1': (-100., 100.),      'fix_b1': False
-    }
+    dicts = [
+        mnpardict( 'mass', pars['mass'],       0.01,   (3.86, 3.89),    False),
+        mnpardict('width', pars['width'],      0.0005, (0., 0.0025),    False),
+        mnpardict( 'fcoh', 0,                  0.1,    (0., 1.),        True),
+        mnpardict( 'fbkg', np.random.random(), 0.1,    (0., 1.),        False),
+        mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), True),
+        mnpardict('sigma', pars['sigma'],      0.1,    (0.0001, 0.005), True),
+        mnpardict(   'b0', 10**3,              10,     (-100., 10**4.), False),
+        mnpardict(   'b1', 0,                  10,     (-100., 100.),   False),
+    ]
+    res = {}
+    for d in dicts:
+        res.update(d)
+    return res
 
 def init_coh_fit(pars=params()):
     """ """
-    return {
-         'mass': pars['mass'],       'error_mass': 0.01,   'limit_mass': (3.86, 3.89),     'fix_mass': False,
-        'width': pars['width'],     'error_width': 0.001, 'limit_width': (0., 0.0025),    'fix_width': False,
-         'fcoh': np.random.random(), 'error_fcoh': 0.1,    'limit_fcoh': (0., 1.),         'fix_fcoh': False,
-         'fbkg': 0,                  'error_fbkg': 0.1,    'limit_fbkg': (0., 1.),         'fix_fbkg': True,
-        'phase': pars['phase'],     'error_phase': 0.1,   'limit_phase': (-np.pi, np.pi), 'fix_phase': False,
-        'sigma': pars['sigma'],     'error_sigma': 0.1,   'limit_sigma': (0.0001, 0.005), 'fix_sigma': True,
-           'b0': pars['b'][1],         'error_b0': 0.1,      'limit_b0': (-100., 100.),      'fix_b0': False,
-           'b1': pars['b'][2],         'error_b1': 0.1,      'limit_b1': (-100., 100.),      'fix_b1': False
-    }
+    dicts = [
+        mnpardict( 'mass', pars['mass'],       0.01,   (3.86, 3.89),    False),
+        mnpardict('width', pars['width'],      0.0005, (0., 0.0025),    False),
+        mnpardict( 'fcoh', np.random.random(), 0.1,    (0., 1.),        False),
+        mnpardict( 'fbkg', 0,                  0.1,    (0., 1.),        True),
+        mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), False),
+        mnpardict('sigma', pars['sigma'],      0.1,    (0.0001, 0.005), True),
+        mnpardict(   'b0', 10**3,              10,     (-100., 10**4.), False),
+        mnpardict(   'b1', 0,                  10,     (-100., 100.),   False),
+    ]
+    res = {}
+    for d in dicts:
+        res.update(d)
+    return res
 
 def make_hist(events, weights, bins=150, range=[3.85, 3.90]):
     hist, bins = np.histogram(events, bins=bins, range=range, weights=weights)

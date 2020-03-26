@@ -3,6 +3,18 @@
 import numpy as np
 from scipy import stats, signal, interpolate
 
+
+# def crystalball(x, mean, sigma, x0, alpha, n):
+#     """ Crystal Ball shape with left tail """
+#     result = np.empty(x.shape)
+#     a = (n / np.abs(alpha))**n * np.exp(-0.5*alpha*2)
+#     b = n / np.abs(alpha) - np.abs(alpha)
+
+def resolution(x, scale, n = 20, alpha = 1.485):
+    xi = x / scale
+    return 0.5 * (stats.crystalball.pdf( xi, n, alpha)+
+                  stats.crystalball.pdf(-xi, n, alpha))
+
 def RelativisticBreitWigner(s, m, g):
     """ Relativistic Breit-Wigner """
     return (m**2 - s - 1j*m*g)**-1
@@ -24,9 +36,9 @@ def cohsum(f, g, frac, phi):
     """ """
     return (1-frac)*f + frac*g*np.exp(1j*phi)
 
-def convolve(x, s, sigma):
+def convolve(x, s, sigma, pdf=stats.norm.pdf):
     """ Discrete convolution with Gaussian resolution """
-    return np.dot(s, stats.norm.pdf(x.reshape(1,-1) - x.reshape(-1,1), scale=sigma))
+    return np.dot(s, pdf(x.reshape(1,-1) - x.reshape(-1,1), scale=sigma))
 
 def model(x, mass, width, fcoh, fbkg, phase, sigma, b, bcoh):
     """ Args:
@@ -45,7 +57,7 @@ def model(x, mass, width, fcoh, fbkg, phase, sigma, b, bcoh):
     pbkg = Normed(x, np.polynomial.polynomial.polyval(x0, b)   , norm_window)
     s = np.abs(cohsum(rbw, pcoh, fcoh, phase))**2
     if sigma > 0:
-        s = convolve(x, s, sigma)
+        s = convolve(x, s, sigma, pdf=resolution)
     sig, bkg = (1. - fbkg)*Normed(x, s, norm_window), fbkg*pbkg
     return (sig, bkg, sig + bkg)
 
@@ -58,7 +70,7 @@ def make_pdf(lo, hi, params):
 
 def make_pdf_hist(bins, params, nevt):
     """ """
-    y = make_pdf(bins[0], bins[-1], params)(bins)
+    y = make_pdf(bins[0], bins[-1], params)[0](bins)
     return y / np.sum(y) * nevt
 
 def params():
@@ -73,3 +85,13 @@ def params():
          'bcoh': [1, 1],
             'b': [1, 1, 0]
     }
+
+def main():
+    import matplotlib.pyplot as plt
+    x = np.linspace(-5, 5, 500)
+    plt.plot(x, resolution(x, 2.43))
+    plt.plot(x, stats.norm.pdf(x, scale=2.43))
+    plt.show()
+
+if __name__ == '__main__':
+    main()
