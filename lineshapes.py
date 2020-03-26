@@ -56,6 +56,11 @@ def make_pdf(lo, hi, params):
     _, _, total = model(x, **params)
     return (interpolate.CubicSpline(x, total), 1.01 * max(total))
 
+def make_pdf_hist(bins, params, nevt):
+    """ """
+    y = make_pdf(bins[0], bins[-1], params)(bins)
+    return y / np.sum(y) * nevt
+
 def params():
     """ Model parameters """
     return {
