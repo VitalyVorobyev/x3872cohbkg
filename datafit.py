@@ -53,7 +53,7 @@ class Fitter(object):
              'bcoh': [1, b0, b1],
                 'b': [1, b0, b1]
         }
-        self.pdf, _ = make_pdf(self.lo, self.hi, self.pars)
+        self.pdf = make_pdf(self.lo, self.hi, self.pars)[0]
         self.norm, _ = integrate.quad(self.pdf, self.lo, self.hi)
 
         loglh = self.loglh()
@@ -77,18 +77,18 @@ class Fitter(object):
         return (fmin, param, corrmtx)
 
 class FitterBinned(object):
-    def fcn(self, mass, width, fcoh, fbkg, phase, sigma, b0, b1):
+    def fcn(self, mass, width, fcoh, fbkg, phase, sigma, bcoh, bbkg):
         self.pars = {
              'mass': mass, 'width': width,
              'fcoh': fcoh, 'fbkg': fbkg,
             'phase': phase, 'sigma': sigma,
-             'bcoh': [1, b0, b1],
-                'b': [1, b0, b1]
+             'bcoh': [1, bcoh],
+                'b': [1, bbkg]
             }
         self.hpdf = make_pdf_hist(self.bins, self.pars, self.nevt)
         chisq = self.chisq()
-        print('chisq: {:.2f}, m {:.3f}, w {:.3f}, fcoh {:.3f}, fbck {:.3f}, phi {:.3f} b1 {:.3f}'.format(
-            chisq, mass*10**3, width*10**3, fcoh, fbkg, phase, b0))
+        print('chisq: {:.2f}, m {:.3f}, w {:.3f}, fcoh {:.3f}, fbck {:.3f}, phi {:.3f} bcoh {:.3f} bbkg {:.3f}'.format(
+            chisq, mass*10**3, width*10**3, fcoh, fbkg, phase, bcoh, bbkg))
         return chisq
 
     def chisq(self):
@@ -110,56 +110,50 @@ def rndm_angle():
 def mnpardict(name, val, err, range, fixed):
     return {name: val, f'error_{name}': err, f'limit_{name}': range, f'fix_{name}': fixed}
 
+def combine_dicts(dicts):
+    res = {}
+    for d in dicts:
+        res.update(d)
+    return res
+
 def init_full_fit(pars=params()):
     """ """
-    dicts = [
+    return combine_dicts([
         mnpardict( 'mass', pars['mass'],       0.01,   (3.86, 3.89),    False),
         mnpardict('width', pars['width'],      0.0005, (0., 0.0025),    False),
         mnpardict( 'fcoh', np.random.random(), 0.1,    (0., 1.),        False),
         mnpardict( 'fbkg', np.random.random(), 0.1,    (0., 1.),        False),
         mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), False),
         mnpardict('sigma', pars['sigma'],      0.1,    (0.0001, 0.005), True),
-        mnpardict(   'b0', 10**3,              10,     (-100., 10**4.), False),
-        mnpardict(   'b1', 0,                  10,     (-100., 100.),   False),
-    ]
-    res = {}
-    for d in dicts:
-        res.update(d)
-    return res
+        mnpardict( 'bcoh', 10**3,              10,     (-100., 10**4.), False),
+        mnpardict( 'bbkg', 0,                  10,     (-100., 10**4.), False),
+    ])
 
 def init_noncoh_fit(pars=params()):
     """ """
-    dicts = [
+    return combine_dicts([
         mnpardict( 'mass', pars['mass'],       0.01,   (3.86, 3.89),    False),
         mnpardict('width', pars['width'],      0.0005, (0., 0.0025),    False),
         mnpardict( 'fcoh', 0,                  0.1,    (0., 1.),        True),
         mnpardict( 'fbkg', np.random.random(), 0.1,    (0., 1.),        False),
         mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), True),
         mnpardict('sigma', pars['sigma'],      0.1,    (0.0001, 0.005), True),
-        mnpardict(   'b0', 10**3,              10,     (-100., 10**4.), False),
-        mnpardict(   'b1', 0,                  10,     (-100., 100.),   False),
-    ]
-    res = {}
-    for d in dicts:
-        res.update(d)
-    return res
+        mnpardict( 'bcoh', 10**3,              10,     (-100., 10**4.), True),
+        mnpardict( 'bbkg', 0,                  10,     (-100., 10**4.),   False),
+    ])
 
 def init_coh_fit(pars=params()):
     """ """
-    dicts = [
+    return combine_dicts([
         mnpardict( 'mass', pars['mass'],       0.01,   (3.86, 3.89),    False),
         mnpardict('width', pars['width'],      0.0005, (0., 0.0025),    False),
         mnpardict( 'fcoh', np.random.random(), 0.1,    (0., 1.),        False),
         mnpardict( 'fbkg', 0,                  0.1,    (0., 1.),        True),
         mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), False),
         mnpardict('sigma', pars['sigma'],      0.1,    (0.0001, 0.005), True),
-        mnpardict(   'b0', 10**3,              10,     (-100., 10**4.), False),
-        mnpardict(   'b1', 0,                  10,     (-100., 100.),   False),
-    ]
-    res = {}
-    for d in dicts:
-        res.update(d)
-    return res
+        mnpardict( 'bcoh', 10**3,              10,     (-100., 10**4.), False),
+        mnpardict( 'bbkg', 0,                  10,     (-100., 10**4.),   True),
+    ])
 
 def make_hist(events, weights, bins=150, range=[3.85, 3.90]):
     hist, bins = np.histogram(events, bins=bins, range=range, weights=weights)

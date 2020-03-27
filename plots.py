@@ -86,12 +86,11 @@ def show_hist_fit(bins, hdata, herrs, pars):
     """ """
     lo, hi = bins[0], bins[-1]
     dots, nbins, N = 500, hdata.shape[0], np.sum(hdata)
-    pdf, _ = make_pdf(lo, hi, pars)
+    pdf, spdf, bpdf, _ = make_pdf(lo, hi, pars)
     x = np.linspace(lo, hi, dots)
     y = pdf(x)
-    integral_pdf = np.sum(y) / dots
-    integral_hist = N / nbins
-    y /= integral_pdf / integral_hist
+    norm = np.sum(y) / dots / (N / nbins)
+    y /= norm
     binsize = (hi - lo) / nbins * 10**3
 
     plt.rc('xtick', labelsize=12)
@@ -101,6 +100,10 @@ def show_hist_fit(bins, hdata, herrs, pars):
     plt.ylabel('events / {:.2f} MeV'.format(binsize), fontsize=16)
     plt.xlabel(r'$m(J/\psi\pi^+\pi^-)$, GeV'.format(binsize), fontsize=16)
     plt.plot(x, y)
+    plt.plot(x, bpdf(x) / norm)
+    plt.xlim(3.85, 3.90)
+    plt.ylim(0.00, 250)
+    # plt.fill_between(x, spdf(x) / norm, 0)
     plt.grid()
     plt.tight_layout()
     plt.show()

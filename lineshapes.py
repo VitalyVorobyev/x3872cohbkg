@@ -57,6 +57,7 @@ def model(x, mass, width, fcoh, fbkg, phase, sigma, b, bcoh):
     pbkg = Normed(x, np.polynomial.polynomial.polyval(x0, b)   , norm_window)
     s = np.abs(cohsum(rbw, pcoh, fcoh, phase))**2
     if sigma > 0:
+        # s = convolve(x, s, sigma)
         s = convolve(x, s, sigma, pdf=resolution)
     sig, bkg = (1. - fbkg)*Normed(x, s, norm_window), fbkg*pbkg
     return (sig, bkg, sig + bkg)
@@ -65,8 +66,10 @@ def make_pdf(lo, hi, params):
     """ """
     grid = 500
     x = np.linspace(0.9*lo, 1.1*hi, grid)
-    _, _, total = model(x, **params)
-    return (interpolate.CubicSpline(x, total), 1.01 * max(total))
+    s, b, total = model(x, **params)
+    return (interpolate.CubicSpline(x, total),
+            interpolate.CubicSpline(x, s),
+            interpolate.CubicSpline(x, b), 1.01 * max(total))
 
 def make_pdf_hist(bins, params, nevt):
     """ """
