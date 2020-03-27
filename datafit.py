@@ -120,7 +120,7 @@ def init_full_fit(pars=params()):
     """ """
     return combine_dicts([
         mnpardict( 'mass', pars['mass'],       0.01,   (3.86, 3.89),    False),
-        mnpardict('width', pars['width'],      0.0005, (0., 0.0025),    False),
+        mnpardict('width', pars['width'],      0.0005, (0., 0.005),    False),
         mnpardict( 'fcoh', np.random.random(), 0.1,    (0., 1.),        False),
         mnpardict( 'fbkg', np.random.random(), 0.1,    (0., 1.),        False),
         mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), False),
@@ -139,7 +139,7 @@ def init_noncoh_fit(pars=params()):
         mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), True),
         mnpardict('sigma', pars['sigma'],      0.1,    (0.0001, 0.005), True),
         mnpardict( 'bcoh', 10**3,              10,     (-100., 10**4.), True),
-        mnpardict( 'bbkg', 0,                  10,     (-100., 10**4.),   False),
+        mnpardict( 'bbkg', 0,                  10,     (-100., 10**4.), False),
     ])
 
 def init_coh_fit(pars=params()):
@@ -152,7 +152,7 @@ def init_coh_fit(pars=params()):
         mnpardict('phase', rndm_angle(),       0.1,    (-np.pi, np.pi), False),
         mnpardict('sigma', pars['sigma'],      0.1,    (0.0001, 0.005), True),
         mnpardict( 'bcoh', 10**3,              10,     (-100., 10**4.), False),
-        mnpardict( 'bbkg', 0,                  10,     (-100., 10**4.),   True),
+        mnpardict( 'bbkg', 0,                  10,     (-100., 10**4.), True),
     ])
 
 def make_hist(events, weights, bins=150, range=[3.85, 3.90]):

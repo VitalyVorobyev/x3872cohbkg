@@ -3,13 +3,6 @@
 import numpy as np
 from scipy import stats, signal, interpolate
 
-
-# def crystalball(x, mean, sigma, x0, alpha, n):
-#     """ Crystal Ball shape with left tail """
-#     result = np.empty(x.shape)
-#     a = (n / np.abs(alpha))**n * np.exp(-0.5*alpha*2)
-#     b = n / np.abs(alpha) - np.abs(alpha)
-
 def resolution(x, scale, n = 20, alpha = 1.485):
     xi = x / scale
     return 0.5 * (stats.crystalball.pdf( xi, n, alpha)+
@@ -17,7 +10,7 @@ def resolution(x, scale, n = 20, alpha = 1.485):
 
 def RelativisticBreitWigner(s, m, g):
     """ Relativistic Breit-Wigner """
-    return (m**2 - s - 1j*m*g)**-1
+    return (m**2 - s + 1j*m*g)**-1
 
 def Norm(x, y, window=None):
     """ """
